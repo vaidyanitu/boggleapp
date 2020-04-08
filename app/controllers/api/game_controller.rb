@@ -9,10 +9,10 @@ class Api::GameController < ApplicationController
     end 
 
     def getRandomChars
-        cs = [*'A'..'Z']
-        returnString=Array.new(16) { cs.sample }.join
+        matrix = Array.new(4) { Array.new(4) { Array('A'..'Z').sample } }
+        random_string = Array('A'..'Z').sample(16).join
         render json: { 
-                :value => returnString
+                :value => matrix
             }.to_json
     end
 

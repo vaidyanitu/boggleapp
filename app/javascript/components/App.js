@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import Board from "./Board";
 
 class App extends React.Component {
   state = {};
@@ -31,22 +32,7 @@ class App extends React.Component {
     return (
       <React.Fragment>
         <h1>Boggle Game</h1>
-
-        <table>
-          <tbody>
-            {this.state.board.map((row, i) => (
-              <tr key={i} id={i}>
-                {row.map((col, j) => (
-                  <td key={j}>
-                    <button key={j} id={j} value={col}>
-                      {col}
-                    </button>
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Board board={this.state.board} />
       </React.Fragment>
     );
   }

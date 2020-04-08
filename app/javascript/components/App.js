@@ -11,7 +11,7 @@ class App extends React.Component {
     super();
     this.state = {
       board: [],
-      searchword: null,
+      searchword: "",
       worlist: [],
     };
   }
@@ -28,15 +28,21 @@ class App extends React.Component {
   };
 
   searchword = (word) => {
+    this.setState({ searchword: word });
     console.log("word searched:", word);
+    this.setState({ searchword: null });
   };
 
+  checkword = (word) => {};
   render() {
     return (
       <React.Fragment>
         <h1>Boggle Game</h1>
         <Board board={this.state.board} />
-        <Search onKeyUp={this.searchword} />
+        <Search
+          val={this.state.searchword}
+          onKeyUp={this.searchword.bind(this)}
+        />
       </React.Fragment>
     );
   }

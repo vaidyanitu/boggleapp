@@ -6,14 +6,14 @@ class Search extends React.Component {
       const val = e.target.value;
       console.log(val);
       this.props.onKeyUp(val);
-      e.target.value = "";
+      e.target.value = this.props.val;
     }
   }
 
   render() {
     return (
       <React.Fragment>
-        <input type="text" onKeyUp={(e) => this.setsearch(e)} />
+        <input type="text" onKeyUp={this.setsearch.bind(this)} />
       </React.Fragment>
     );
   }

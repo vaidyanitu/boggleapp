@@ -16,4 +16,16 @@ class Api::GameController < ApplicationController
             }.to_json
     end
 
+
+    
+    def checkWord
+     parameters= params[:board]
+    
+    render json: { params: parameters }
+    end
+
+def checkparams
+    params.permit(:arr)
+end
+
 end

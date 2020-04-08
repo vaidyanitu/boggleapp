@@ -4,5 +4,6 @@ root "home#index"
 namespace :api, defaults: { format: 'json' } do
   get 'games', to:"game#index"
   get 'chars', to: "game#getRandomChars"
+  post 'check', to: "game#checkWord"
 end
 end

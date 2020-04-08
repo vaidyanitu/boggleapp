@@ -1,7 +1,7 @@
 import React from "react";
-import PropTypes from "prop-types";
 import axios from "axios";
 import Board from "./Board";
+import Search from "./Search";
 
 class App extends React.Component {
   state = {};
@@ -11,7 +11,8 @@ class App extends React.Component {
     super();
     this.state = {
       board: [],
-      value: null,
+      searchword: null,
+      worlist: [],
     };
   }
 
@@ -26,13 +27,16 @@ class App extends React.Component {
     });
   };
 
-  render() {
-    console.log("value", this.state.value);
+  searchword = (word) => {
+    console.log("word searched:", word);
+  };
 
+  render() {
     return (
       <React.Fragment>
         <h1>Boggle Game</h1>
         <Board board={this.state.board} />
+        <Search onKeyUp={this.searchword} />
       </React.Fragment>
     );
   }

@@ -14,11 +14,13 @@ class App extends React.Component {
       board: [],
       searchword: "",
       worlist: [],
+      matrix: [],
     };
   }
 
   componentDidMount() {
     this.setchar();
+    this.checkAdjacent();
     passCsrfToken(document, axios);
   }
 
@@ -29,15 +31,26 @@ class App extends React.Component {
     });
   };
 
+  checkAdjacent() {
+    console.log("here i m");
+    var adjlist = [];
+    var i = 0;
+    // this.state.board.map((row, a) => {
+    //   for (j = 0; j < 4; j++) {
+    //     console.log("i,j:", i, j);
+    //     row.map((col, b) => (adjlist[i][j] = col));
+    //   }
+    //   i++;
+    // });
+    //adjlist.forEach((x) => console.log(x));
+    Object.keys(this.state.board).map((key) => {
+      console.log(this.state.board[key]);
+    });
+  }
+
   searchword = (word) => {
     this.setState({ searchword: word });
     console.log("word searched:", word);
-    // const dta = { board: "test" };
-    // axios
-    //   .post(`http://127.0.0.1:3000/api/check`, { board: "test" })
-    //   .then((res) => {
-    //     console.log("here", res.data);
-    //   });
     const post = {
       board: this.state.board,
     };

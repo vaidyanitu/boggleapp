@@ -3,6 +3,7 @@ import axios from "axios";
 import Board from "./Board";
 import Search from "./Search";
 import { passCsrfToken } from "../util/helpers";
+import Appnotifier from "./Appnotifier";
 
 class App extends React.Component {
   state = {};
@@ -15,6 +16,7 @@ class App extends React.Component {
       searchword: "",
       wordlist: [],
       adjacentlist: [],
+      message: "",
     };
   }
 
@@ -35,7 +37,8 @@ class App extends React.Component {
   };
 
   searchword = (word) => {
-    this.setState({ searchword: word });
+    let searchword = word;
+    this.setState({ searchword });
     console.log("word searched:", word);
     // const post = {
     //   board: this.state.board,
@@ -44,27 +47,32 @@ class App extends React.Component {
     //   console.log(response);
     //   console.log(response.data);
     // });
-    this.checkword(word);
+    let validword = this.checkword(searchword);
+    if (!validword) {
+      this.setState({ message: "Invalid Word" });
+      // this.setState({ searchword });
+    } else {
+      this.setState({ searchword: "" });
+    }
   };
 
   checkword = (word) => {
     debugger;
-    if (word.length < 2) {
+    let isvalid = true;
+    if (word.length <= 2) {
       console.log("invalid word");
+      alert("invalid word");
     } else {
       for (let i = 0; i < word.length - 1; i++) {
         let adjcell = word.substring(i, i + 2);
         adjcell = adjcell.split("").sort().join("").toUpperCase();
         let arraylist = this.state.adjacentlist;
-        if (arraylist.includes(adjcell)) {
-          console.log("valid word", adjcell);
-          this.setState({ searchword: null });
-        } else {
-          console.log("invalid word:", adjcell);
-          alert("Invalid word");
+        if (!arraylist.includes(adjcell)) {
+          isvalid = false;
           break;
         }
       }
+      return isvalid;
     }
   };
 
@@ -77,6 +85,8 @@ class App extends React.Component {
           val={this.state.searchword}
           onKeyUp={this.searchword.bind(this)}
         />
+
+        <Appnotifier message={this.state.message} />
       </React.Fragment>
     );
   }

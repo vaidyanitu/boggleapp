@@ -37,9 +37,7 @@ class Api::GameController < ApplicationController
                 if nextcolindex<4 
                     #for columns adjacent  
                     data=people[indexrow][indexcol]+people[indexrow][nextcolindex]
-                    p data
                     data=data.split('').sort.join
-                    p data
                     arlist.append(data)
                 end                          
                 if nextrowindex<4

@@ -13,56 +13,61 @@ class App extends React.Component {
     this.state = {
       board: [],
       searchword: "",
-      worlist: [],
-      matrix: [],
+      wordlist: [],
+      adjacentlist: [],
     };
   }
 
   componentDidMount() {
     this.setchar();
-    this.checkAdjacent();
     passCsrfToken(document, axios);
   }
 
   setchar = () => {
     axios.get(`http://127.0.0.1:3000/api/chars`).then((res) => {
       const board = res.data.value;
+      const adjacentlist = res.data.arraylist;
       this.setState({ board });
+      this.setState({ adjacentlist });
+      console.log(board);
+      console.log(adjacentlist);
     });
   };
-
-  checkAdjacent() {
-    console.log("here i m");
-    var adjlist = [];
-    var i = 0;
-    // this.state.board.map((row, a) => {
-    //   for (j = 0; j < 4; j++) {
-    //     console.log("i,j:", i, j);
-    //     row.map((col, b) => (adjlist[i][j] = col));
-    //   }
-    //   i++;
-    // });
-    //adjlist.forEach((x) => console.log(x));
-    Object.keys(this.state.board).map((key) => {
-      console.log(this.state.board[key]);
-    });
-  }
 
   searchword = (word) => {
     this.setState({ searchword: word });
     console.log("word searched:", word);
-    const post = {
-      board: this.state.board,
-    };
-
-    axios.post("/api/check", post).then((response) => {
-      console.log(response);
-      console.log(response.data);
-    });
-    this.setState({ searchword: null });
+    // const post = {
+    //   board: this.state.board,
+    // };
+    // axios.post("/api/check", post).then((response) => {
+    //   console.log(response);
+    //   console.log(response.data);
+    // });
+    this.checkword(word);
   };
 
-  checkword = (word) => {};
+  checkword = (word) => {
+    debugger;
+    if (word.length < 2) {
+      console.log("invalid word");
+    } else {
+      for (let i = 0; i < word.length - 1; i++) {
+        let adjcell = word.substring(i, i + 2);
+        adjcell = adjcell.split("").sort().join("").toUpperCase();
+        let arraylist = this.state.adjacentlist;
+        if (arraylist.includes(adjcell)) {
+          console.log("valid word", adjcell);
+          this.setState({ searchword: null });
+        } else {
+          console.log("invalid word:", adjcell);
+          alert("Invalid word");
+          break;
+        }
+      }
+    }
+  };
+
   render() {
     return (
       <React.Fragment>

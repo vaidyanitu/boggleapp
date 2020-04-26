@@ -178,14 +178,15 @@ def checkWord
 
     
     if firstAdjacentslist.length>0                          
-         firstAdjacentslist.each do |item| 
+         firstAdjacentslist.each do |item|           
             if !exists
                 adjl=item      
+                traversed=[]
                 for i in 1...word.length  
-                    p i 
+                     p i 
                     #iterate through each character in word           
                     char= word[i].chr 
-                    p char
+                     p char
                     if !boardchars.include?(char)
                         exists=false 
                         break                   
@@ -196,9 +197,9 @@ def checkWord
                                 adjl=result
                                 exists=true
                                 #   next
-                            else                       
-                                exists=false 
-                                break                                            
+                            else
+                                    exists=false 
+                                    break                                  
                             end 
                         end  
                     end
@@ -217,15 +218,24 @@ end
 
 def checklist(char, item,people,traversed)
     item.each do |index,adjlist|
-        traversed.push(index)     #add index of traversed cell
+        p "item"
+        p item
+         traversed.push(index)
+            #add index of traversed cell
         adjlist.each do |position,value|
             if value.include?(char) #check if adjacent cell contains next character
                 indexrow=position[0]
                 indexcol=position[1]
-                p(indexrow+indexcol)
+                place=[indexrow,indexcol]
+                p "yes"
+                p "next post",place
+                # traversed.push(place) 
+                p "traversed"
+                p traversed
+                #  p(indexrow,indexcol)
                 #if contains, get cell position and adjacent list of that cell
                 nextadjlist=adjacentlist(indexrow,indexcol,people,traversed)  
-                p nextadjlist
+                 p nextadjlist
                 return nextadjlist
             else
                 #if doesn't contain, continue loop

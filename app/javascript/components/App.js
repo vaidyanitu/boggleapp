@@ -15,7 +15,6 @@ class App extends React.Component {
       board: [],
       searchword: "",
       boardchars: [],
-      adjacentlist: [],
       message: "",
     };
   }
@@ -38,16 +37,15 @@ class App extends React.Component {
   }
 
   setchar = () => {
-    axios.get(`http://127.0.0.1:3000/api/chars`).then((res) => {
+    axios.get(`http://127.0.0.1:3000/api/board`).then((res) => {
       const board = res.data.value;
-      const adjacentlist = res.data.arraylist;
       this.setState({ board });
       this.setboardchars();
-      this.setState({ adjacentlist });
     });
   };
 
   searchword = (word) => {
+    console.log("boardchars:", this.state.boardchars);
     let searchword = word.toUpperCase();
     this.setState({ searchword });
     console.log("word searched:", word);
@@ -55,7 +53,6 @@ class App extends React.Component {
     const post = {
       board: this.state.board,
       word: searchword,
-      arlist: this.state.adjacentlist,
     };
     axios.post("/api/check", post).then((response) => {
       console.log(response);
@@ -69,8 +66,6 @@ class App extends React.Component {
       console.log("invalid word");
       alert("invalid word");
     } else {
-      let wordlist = this.state.adjacentlist;
-      let lst = [];
       for (let i = 0; i < word.length - 1; i++) {
         let chr = word.substring(i, i + 1).toUpperCase();
         if (!this.state.boardchars.includes(chr)) {
@@ -81,19 +76,8 @@ class App extends React.Component {
         } else {
           let adjcell = word.substring(i, i + 2);
           adjcell = adjcell.split("").sort().join("").toUpperCase();
-          if (!wordlist.includes(adjcell)) {
-            isvalid = false;
-            break;
-          } else {
-            const index = wordlist.indexOf(adjcell);
-            // if (index > -1) {
-            //   wordlist.splice(index, 1);
-            // }
-            lst.push(word.substring(i, i + 1));
-          }
         }
       }
-      console.log(lst);
       // let isright = this.checkTraversed(lst);
       return isvalid;
     }
@@ -101,7 +85,6 @@ class App extends React.Component {
 
   checkadj = (word) => {
     debugger;
-    let wordlist = this.state.adjacentlist;
     let lst = [];
     let searchword = word.toUpperCase();
     searchword = searchword.substring(0, 1);

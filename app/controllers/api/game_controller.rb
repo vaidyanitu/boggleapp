@@ -20,6 +20,41 @@ class Api::GameController < ApplicationController
             }.to_json
     end
     
+def getrandom
+    result=Array('A'..'Z').sample
+    return result
+end
+
+def chr(char,adjacentvalues) 
+    x=getrandom
+    until !adjacentvalues.include?(x)
+        x= getrandom    
+    end
+    return x
+end
+
+
+def createBoard
+    matrix = Array.new(4) { Array.new(4) { Array('A'..'Z').sample } }
+    tvd=[]
+    for i in 0..3
+        for j in 0..3       
+            # no adjacent cells should have same value    
+            cellval=matrix[i][j]
+            rs=adjacentlist(i,j,matrix,tvd)
+            rs.each do |key,val|
+                adlist=[]
+                val.map { |index,value| adlist.push(value) }
+                matrix[i][j]=chr(cellval,adlist)
+            end
+        end
+    end
+    render json: { 
+        :value => matrix
+    }.to_json
+end
+
+
 
     def dfs(board)
         firstAdjacentslist=[]
@@ -161,6 +196,7 @@ def checkWord
     traversed=[]
     i=0
     exists =false
+    revertpoint=[]
     boardchars=""  
 
     #get index of first char in word
@@ -191,6 +227,8 @@ def checkWord
                         exists=false 
                         break                   
                     else
+                        # if i<wordlength && adj.length<0
+                        # end
                         if adjl.length>0                 
                             result=checklist(char,adjl,people,traversed) 
                             if result
@@ -223,7 +261,8 @@ def checklist(char, item,people,traversed)
          traversed.push(index)
             #add index of traversed cell
         adjlist.each do |position,value|
-            if value.include?(char) #check if adjacent cell contains next character
+            if value.include?(char) #check if adjacent cell contains next character              
+                p "count",value.count('char')
                 indexrow=position[0]
                 indexcol=position[1]
                 place=[indexrow,indexcol]

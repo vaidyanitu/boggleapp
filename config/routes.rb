@@ -9,5 +9,6 @@ namespace :api, defaults: { format: 'json' } do
   get 'al', to: "game#adjacentlist"
   get 'adj', to:"game#adjacent"
   get 'dt', to: "game#dfs"
+  get "board", to: "game#createBoard"
 end
 end

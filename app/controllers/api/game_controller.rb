@@ -8,125 +8,15 @@ class Api::GameController < ApplicationController
         }]
             }.to_json
     end 
-
+    
     def getRandomChars
-        
         # random_string = Array('A'..'Z').sample(16).join
         matrix = Array.new(4) { Array.new(4) { Array('A'..'Z').sample } }
-        arraylist=dfs(matrix)
         render json: { 
-                :value => matrix,
-                :arraylist => arraylist
+                :value => matrix
             }.to_json
     end
-    
-def getrandom
-    result=Array('A'..'Z').sample
-    return result
-end
 
-def chr(char,adjacentvalues) 
-    x=getrandom
-    until !adjacentvalues.include?(x)
-        x= getrandom    
-    end
-    return x
-end
-
-
-def createBoard
-    matrix = Array.new(4) { Array.new(4) { Array('A'..'Z').sample } }
-    tvd=[]
-    for i in 0..3
-        for j in 0..3       
-            # no adjacent cells should have same value    
-            cellval=matrix[i][j]
-            rs=adjacentlist(i,j,matrix,tvd)
-            rs.each do |key,val|
-                adlist=[]
-                val.map { |index,value| adlist.push(value) }
-                matrix[i][j]=chr(cellval,adlist)
-            end
-        end
-    end
-    render json: { 
-        :value => matrix
-    }.to_json
-end
-
-
-
-    def dfs(board)
-        firstAdjacentslist=[]
-        # board = [["A", "B", "C","I"], ["D", "G", "B","L"], ["Y", "M", "P","K"], ["N", "E", "X","R"]]
-        people=board
-        list=""
-        people.each_with_index do |row,indexrow|                      
-            row.each_with_index do |row,indexcol|  
-                arlist=[]             
-                nextrowindex=indexrow+1  
-                nextcolindex=indexcol+1  
-                if indexrow>0  #up traversal
-                    #for row above 
-                    data=people[indexrow][indexcol]+people[indexrow-1][indexcol]
-                    arlist.append(data)
-                    #for left diagonal above
-                    if indexcol<3
-                    data=people[indexrow][indexcol]+people[indexrow-1][indexcol+1]
-                    # data=data.split('').sort.join
-                    arlist.append(data)
-                    end
-                    
-                    if indexcol>0
-                        #for right diagonal above
-                        data=people[indexrow][indexcol]+people[indexrow-1][indexcol-1]
-                        # data=data.split('').sort.join
-                        arlist.append(data)
-                        
-                    end
-                end
-                if indexcol>0 #left traversal
-                        #for col left 
-                        data=people[indexrow][indexcol]+people[indexrow][indexcol-1]
-                        arlist.append(data)                    
-                end
-
-                if nextcolindex<4 
-                    #for columns right  
-                    data=people[indexrow][indexcol]+people[indexrow][nextcolindex]
-                    # data=data.split('').sort.join
-                    arlist.append(data)
-                end                          
-                if nextrowindex<4
-                    #for row right 
-                    data= people[indexrow][indexcol]+people[nextrowindex][indexcol]
-                    # data=data.split('').sort.join
-                    arlist.append(data)
-                end  
-                if indexrow<3 && indexcol<3
-                    #for right diagonals below
-                    data=people[indexrow][indexcol]+people[nextrowindex][nextcolindex]
-                    # data=data.split('').sort.join
-                    arlist.append(data)
-                end
-                if indexrow<3 && indexcol>0
-                    nextrow=indexrow+1
-                    nextcol=indexcol-1
-                    #for left diagonals below
-                    data=people[indexrow][indexcol]+people[nextrow][nextcol]
-                    # data=data.split('').sort.join
-                    arlist.append(data)
-                end
-                firstAdjacentslist.append(arlist)
-            end
-        end
-        return firstAdjacentslist
-        # render json: {   
-        #     :board => board,         
-        #     :a0 => firstAdjacentslist
-        # }.to_json
-        
-    end
 
 def adjacentlist(indexrow,indexcol,people,traversed)
     arlist={}      
@@ -167,8 +57,7 @@ def adjacentlist(indexrow,indexcol,people,traversed)
                     if indexrow<3 && indexcol>0                     
                         #for left diagonals below                         
                         data=addtolist(nextrowindex,prevcolindex,traversed,arr,*people) 
-                    end
-                    
+                    end                    
                      arlist[ind] =arr
     return arlist
 end
@@ -184,29 +73,25 @@ end
 
 def checkWord
     word= params[:word]      
-    p word      
     board=params[:board]
     arlist=params[:arlist]
     # word="YOUPEXKLPB"
-    samechar=[]
     firstAdjacentslist=[]
     #  board = [["A", "B", "C","I"], ["D", "O", "B","L"], ["Y", "U", "P","K"], ["N", "E", "X","R"]]
-    people=board
     list=""
     traversed=[]
     i=0
     exists =false
-    revertpoint=[]
     boardchars=""  
 
     #get index of first char in word
-    people.each_with_index do |row,indexrow|                      
+    board.each_with_index do |row,indexrow|                      
         row.each_with_index do |col,indexcol| 
             boardchars+=col
             if col==word[0,1]   
                 position=[indexrow,indexcol]
                 # traversed.append(position)  
-                list = adjacentlist(indexrow,indexcol,people,traversed)
+                list = adjacentlist(indexrow,indexcol,board,traversed)
                 firstAdjacentslist.append(list)              
             end          
         end
@@ -216,75 +101,155 @@ def checkWord
     if firstAdjacentslist.length>0                          
          firstAdjacentslist.each do |item|           
             if !exists
-                adjl=item      
-                traversed=[]
-                for i in 1...word.length  
-                     p i 
-                    #iterate through each character in word           
-                    char= word[i].chr 
-                     p char
-                    if !boardchars.include?(char)
-                        exists=false 
-                        break                   
-                    else
-                        # if i<wordlength && adj.length<0
-                        # end
-                        if adjl.length>0                 
-                            result=checklist(char,adjl,people,traversed) 
-                            if result
-                                adjl=result
-                                exists=true
-                                #   next
-                            else
-                                    exists=false 
-                                    break                                  
-                            end 
-                        end  
-                    end
-                end  
-            end                               
+                traversed=[] 
+                result=checkloop(item,1,word,board,traversed,false)
+                p "word exists1 ", result
+                exists=result                
+            else
+                break
+            end                           
         end        
     end   
         
     render json: {   
-        :board => people,
+        :board => board,
         :a0 => firstAdjacentslist,  # if null, doesnt exist
         :traversed => traversed,
-        :wordexists =>exists
+        :exists =>exists
     }.to_json
 end
 
-def checklist(char, item,people,traversed)
-    item.each do |index,adjlist|
-        p "item"
-        p item
-         traversed.push(index)
+def checklist(char, item,board,traversed)  
+    nextadjacentlist=[]        
             #add index of traversed cell
-        adjlist.each do |position,value|
-            if value.include?(char) #check if adjacent cell contains next character              
-                p "count",value.count('char')
+            p "adjlist",item
+            # rst=clients.select{|key, hash| hash["key"] == char }
+        item.map{|position,value|
+            # p "position", position
+            # p "value",value
+            if value.include?(char)  #check if adjacent cell contains next character              
                 indexrow=position[0]
                 indexcol=position[1]
-                place=[indexrow,indexcol]
-                p "yes"
-                p "next post",place
-                # traversed.push(place) 
-                p "traversed"
-                p traversed
-                #  p(indexrow,indexcol)
+                place=[indexrow,indexcol]   
+                p "traversed", traversed   
+                if traversed.include? (place) 
+                    p "already traversed"                                          
+                else                        
+                #  traversed.push(place)             
                 #if contains, get cell position and adjacent list of that cell
-                nextadjlist=adjacentlist(indexrow,indexcol,people,traversed)  
-                 p nextadjlist
-                return nextadjlist
-            else
-                #if doesn't contain, continue loop
-                next
+                    nextadjlist=adjacentlist(indexrow,indexcol,board,traversed)  
+                    nextadjacentlist.push(nextadjlist)
+                end
             end
+        }
+        if nextadjacentlist.length>0
+            p "checklistresult", nextadjacentlist
+            return nextadjacentlist
+        else
+            return []
         end
-        return
-    end
 end
 
-    
+    def checkloop(adjacentlist,wordindex,word,board,traversed,wordexists)
+        
+        nextadjacentlist=adjacentlist
+        exists=false
+        # exists=wordexists
+        # if exists==true
+        #     return exists
+        # end
+        rslt={}
+            i=wordindex
+            p i
+            p "word",word
+                char=word[i,1]
+                p "char",char
+                p "nextadjlist",nextadjacentlist
+                if !exists
+                    if nextadjacentlist.length>0
+                        nextadjacentlist.each do |itemindex,itemval|
+                                p "itemval",itemval
+                                traversed.push(itemindex)
+                                result=checklist(char,itemval,board,traversed)
+                                p "result",result
+                                if result.length>0
+                                    i=i+1
+                                    if i<word.length
+                                        result.each do |itm|
+                                            if !exists  
+                                                rslt=checkloop(itm,i,word,board,traversed,false) 
+                                                p "rslt",rslt
+                                                exists=rslt
+                                                if exists
+                                                    return exists
+                                                end                                                
+                                            else
+                                                break                                  
+                                            end
+                                        end
+                                    elsif i==word.length
+                                        p "ends here"
+                                        if result
+                                            exists=true
+                                            return exists
+                                            break
+                                        end
+                                    end
+                                else
+                                    exists=false
+                                    traversed=[] 
+                                    
+                                end
+                        
+                        end
+                    end
+                # else
+                #     exists=true
+                end
+            
+        p "exists2", exists
+        return exists 
+    end
+
+    def loopcheck(char,itemval,board,traversed)
+        result=checklist(char,itemval,board,traversed)
+                        p "result",result
+                        if result
+                            if result.length>0
+                                p "has result"
+                                i=i+1
+                                if i<word.length
+                                # exists=true
+                                    result.each do |itm|
+                                        if !exists  
+                                            p "itm", itm              
+                                            rslt=checkloop(itm,i,word,board,traversed)
+                                            if rslt
+                                                exists=true
+                                                break
+                                            else 
+                                                exists = false
+                                                traversed=[] 
+                                            end
+                                        end
+                                        # if !rslt
+                                        #      break 
+                                        # end
+                                    end
+                                elsif i==word.length
+                                    p "ends here"
+                                    if result
+                                        exists=true
+                                    end
+                                end
+                            else
+                                p "has no result"
+                                exists=false
+                            end
+                        else
+                            exists=false
+                            traversed=[] 
+                        end
+    end
 
 end

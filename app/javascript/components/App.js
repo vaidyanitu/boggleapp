@@ -37,7 +37,7 @@ class App extends React.Component {
   }
 
   setchar = () => {
-    axios.get(`http://127.0.0.1:3000/api/board`).then((res) => {
+    axios.get(`http://127.0.0.1:3000/api/chars`).then((res) => {
       const board = res.data.value;
       this.setState({ board });
       this.setboardchars();

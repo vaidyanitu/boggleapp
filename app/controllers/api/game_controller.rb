@@ -17,6 +17,48 @@ class Api::GameController < ApplicationController
             }.to_json
     end
 
+    def getrandom
+        charset = Array('A'..'Z') + Array('a'..'z') # to randomize data effectively
+        result=charset.sample.upcase
+        return result
+    end
+    
+    def chr(char,adjacentvalues) 
+        x=getrandom
+        until !adjacentvalues.include?(x)
+            x= getrandom    
+        end
+        return x
+    end
+
+
+
+    def createBoard
+        matrix = Array.new(4) { Array.new(4) { Array('A'..'Z').sample } }
+        tvd=[]
+        for i in 0..3
+            for j in 0..3       
+                # no adjacent cells should have same value    
+                cellval=matrix[i][j]
+                rs=adjacentlist(i,j,matrix,tvd)
+                # make value of adjacent cells unique                
+                rs=adjacentlist(i,j,matrix,tvd)
+                #check that current cell value and adjacent cells are different
+                rs.each do |key,val|
+                    adlist=[]
+                    val.map { |index,value|                     
+                        adlist.push(value) 
+                       }
+                    matrix[i][j]=chr(cellval,adlist)
+                end
+                
+            end
+        end
+        render json: { 
+            :value => matrix
+        }.to_json
+    end
+
 
 def adjacentlist(indexrow,indexcol,people,traversed)
     arlist={}      
@@ -103,7 +145,6 @@ def checkWord
             if !exists
                 traversed=[] 
                 result=checkloop(item,1,word,board,traversed,false)
-                p "word exists1 ", result
                 exists=result                
             else
                 break
@@ -122,20 +163,14 @@ end
 def checklist(char, item,board,traversed)  
     nextadjacentlist=[]        
             #add index of traversed cell
-            p "adjlist",item
-            # rst=clients.select{|key, hash| hash["key"] == char }
-        item.map{|position,value|
-            # p "position", position
-            # p "value",value
+        item.map{|position,value|            
             if value.include?(char)  #check if adjacent cell contains next character              
                 indexrow=position[0]
                 indexcol=position[1]
                 place=[indexrow,indexcol]   
-                p "traversed", traversed   
                 if traversed.include? (place) 
                     p "already traversed"                                          
                 else                        
-                #  traversed.push(place)             
                 #if contains, get cell position and adjacent list of that cell
                     nextadjlist=adjacentlist(indexrow,indexcol,board,traversed)  
                     nextadjacentlist.push(nextadjlist)
@@ -143,7 +178,6 @@ def checklist(char, item,board,traversed)
             end
         }
         if nextadjacentlist.length>0
-            p "checklistresult", nextadjacentlist
             return nextadjacentlist
         else
             return []
@@ -151,34 +185,25 @@ def checklist(char, item,board,traversed)
 end
 
     def checkloop(adjacentlist,wordindex,word,board,traversed,wordexists)
-        
+        if adjacentlist.length==0
+
+        end
         nextadjacentlist=adjacentlist
         exists=false
-        # exists=wordexists
-        # if exists==true
-        #     return exists
-        # end
         rslt={}
             i=wordindex
-            p i
-            p "word",word
-                char=word[i,1]
-                p "char",char
-                p "nextadjlist",nextadjacentlist
+            char=word[i,1]
                 if !exists
                     if nextadjacentlist.length>0
                         nextadjacentlist.each do |itemindex,itemval|
-                                p "itemval",itemval
                                 traversed.push(itemindex)
                                 result=checklist(char,itemval,board,traversed)
-                                p "result",result
                                 if result.length>0
                                     i=i+1
                                     if i<word.length
                                         result.each do |itm|
                                             if !exists  
                                                 rslt=checkloop(itm,i,word,board,traversed,false) 
-                                                p "rslt",rslt
                                                 exists=rslt
                                                 if exists
                                                     return exists
@@ -188,7 +213,6 @@ end
                                             end
                                         end
                                     elsif i==word.length
-                                        p "ends here"
                                         if result
                                             exists=true
                                             return exists
@@ -203,53 +227,9 @@ end
                         
                         end
                     end
-                # else
-                #     exists=true
                 end
             
-        p "exists2", exists
         return exists 
-    end
-
-    def loopcheck(char,itemval,board,traversed)
-        result=checklist(char,itemval,board,traversed)
-                        p "result",result
-                        if result
-                            if result.length>0
-                                p "has result"
-                                i=i+1
-                                if i<word.length
-                                # exists=true
-                                    result.each do |itm|
-                                        if !exists  
-                                            p "itm", itm              
-                                            rslt=checkloop(itm,i,word,board,traversed)
-                                            if rslt
-                                                exists=true
-                                                break
-                                            else 
-                                                exists = false
-                                                traversed=[] 
-                                            end
-                                        end
-                                        # if !rslt
-                                        #      break 
-                                        # end
-                                    end
-                                elsif i==word.length
-                                    p "ends here"
-                                    if result
-                                        exists=true
-                                    end
-                                end
-                            else
-                                p "has no result"
-                                exists=false
-                            end
-                        else
-                            exists=false
-                            traversed=[] 
-                        end
     end
 
 end

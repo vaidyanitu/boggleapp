@@ -17,7 +17,7 @@ class Validwords extends React.Component {
 
     return (
       <React.Fragment>
-        Wordlist:
+        <h2>Words:</h2>
         <ul>{listItems}</ul>
       </React.Fragment>
     );

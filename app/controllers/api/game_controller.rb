@@ -25,7 +25,8 @@ class Api::GameController < ApplicationController
     
     def chr(char,adjacentvalues) 
         x=getrandom
-        until !adjacentvalues.include?(x)
+        #make adjacent values unique and avoid cells from having value Q
+        until !adjacentvalues.include?(x) and x!='Q'
             x= getrandom    
         end
         return x

@@ -24,7 +24,7 @@ class App extends React.Component {
       showMatrix: false,
       minutes: 1,
       seconds: 0,
-      showResult: false,
+      dontshowResult: true,
     };
     this.getvalidwords = this.getvalidwords.bind(this);
   }
@@ -34,26 +34,28 @@ class App extends React.Component {
     passCsrfToken(document, axios);
   }
 
-  myInterval = setInterval(() => {
-    const { seconds, minutes } = this.state;
-    if (seconds > 0) {
-      this.setState(({ seconds }) => ({
-        seconds: seconds - 1,
-      }));
-    }
-    if (seconds === 0) {
-      if (minutes === 0) {
-        clearInterval(this.myInterval);
-        this.setState({ showResult: true });
-        console.log(this.state.showResult);
-      } else {
-        this.setState(({ minutes }) => ({
-          minutes: minutes - 1,
-          seconds: 59,
+  myInterval() {
+    setInterval(() => {
+      const { seconds, minutes } = this.state;
+      if (seconds > 0) {
+        this.setState(({ seconds }) => ({
+          seconds: seconds - 1,
         }));
       }
-    }
-  }, 1000);
+      if (seconds === 0) {
+        if (minutes === 0) {
+          clearInterval(this.myInterval);
+          this.setState({ dontshowResult: false });
+          console.log(this.state.dontshowResult);
+        } else {
+          this.setState(({ minutes }) => ({
+            minutes: minutes - 1,
+            seconds: 59,
+          }));
+        }
+      }
+    }, 1000);
+  }
 
   setboardchars() {
     let boardchars = "";
@@ -75,7 +77,22 @@ class App extends React.Component {
     };
     axios.post("/api/word", post).then((response) => {
       var result = response.data.value.raw_body;
-      this.setState({ wordlist: result });
+      this.setState(
+        { wordlist: result }
+        // ,
+        // this.setState({
+        //   wordlist: this.state.wordlist.filter((item) => {
+        //     if (
+        //       this.state.boardchars.includes("Q") &&
+        //       !this.state.boardchars.includes("U")
+        //     ) {
+        //       item.substring(1, 1) != "Q";
+        //     } else {
+        //       item;
+        //     }
+        //   }),
+        // })
+      );
     });
   }
 
@@ -85,7 +102,6 @@ class App extends React.Component {
       this.setState({ board });
       this.setboardchars();
     });
-    this.myInterval;
   };
 
   charexists = () => {
@@ -145,21 +161,14 @@ class App extends React.Component {
   getvalidwords = () => {
     console.log("validwords", this.state.validwords);
     this.setState({ showMatrix: true });
-    // return this.state.validwords;
+    this.myInterval();
   };
 
   render() {
-    // styles = StyleSheet.create({
-    //   container: {
-    //     flex: 1,
-    //     flexDirection: "row",
-    //     flexWrap: "wrap",
-    //     alignItems: "flex-start", // if you want to fill rows left to right
-    //   },
-    //   item: {
-    //     width: "50%", // is 50% of container width
-    //   },
-    // });
+    const mystyle = {
+      width: "50%",
+      padding: "20px",
+    };
     return (
       <React.Fragment>
         <h1>Boggle Game</h1>
@@ -167,22 +176,35 @@ class App extends React.Component {
           <button onClick={this.getvalidwords}>Start</button>
         ) : (
           <React.Fragment>
-            {this.state.showResult == true ? (
-              <Result validwords={this.state.validwords} />
-            ) : (
-              <div>
-                <Board board={this.state.board} />
-                <Search
-                  val={this.state.searchword}
-                  onKeyUp={this.searchword.bind(this)}
-                />
-                <Appnotifier message={this.state.message} />
+            {this.state.dontshowResult == true ? (
+              <div style={{ width: "100%", overflow: "hidden" }}>
                 <Timer
                   minutes={this.state.minutes}
                   seconds={this.state.seconds}
                 />
-                <Validwords wordslist={this.state.validwords} />
+                <div style={{ width: "600px", float: "left" }}>
+                  <Board board={this.state.board} />
+                  <Search
+                    val={this.state.searchword}
+                    onKeyUp={this.searchword.bind(this)}
+                  />
+                  <Appnotifier message={this.state.message} />
+                </div>
+                <div
+                  style={{
+                    marginLeft: "620px",
+                    maxHeight: "200px",
+                    overflowY: "scroll",
+                  }}
+                >
+                  <Validwords wordslist={this.state.validwords} />
+                </div>
               </div>
+            ) : (
+              <Result
+                validwords={this.state.validwords}
+                dictionary={this.state.wordlist}
+              />
             )}
           </React.Fragment>
         )}

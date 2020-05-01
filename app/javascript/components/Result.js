@@ -12,24 +12,36 @@ class Result extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <table>
-          <tbody>
-            <tr>
-              <th>Word</th>
-              <th>Score</th>
-            </tr>
-            {this.props.validwords.map((word, index) => (
-              <tr key={index}>
-                <td key={"a" + index}>{word}</td>
-                <td key={"b" + index}>{word.length}</td>
-              </tr>
-            ))}
-            <tr>
-              <td>Total Score</td>
-              <td>{this.totalscore()}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{ width: "100%" }}>
+          <div style={{ width: "600px", float: "left" }}>
+            <table>
+              <tbody>
+                <tr>
+                  <th>Word</th>
+                  <th>Score</th>
+                </tr>
+                {this.props.validwords.map((word, index) => (
+                  <tr
+                    key={index}
+                    style={{ maxHeight: "300px", overflowY: "scroll" }}
+                  >
+                    <td key={"a" + index}>{word}</td>
+                    <td key={"b" + index}>{word.length}</td>
+                  </tr>
+                ))}
+                <tr>
+                  <td>Total Score</td>
+                  <td>{this.totalscore()}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3>Your Total Score:{this.totalscore()}</h3>
+            <h2>Possible list of words:</h2>
+            <p>{this.props.dictionary}</p>
+          </div>
+        </div>
       </React.Fragment>
     );
   }

@@ -9,12 +9,37 @@ import Timer from "./Timer";
 import Result from "./Result";
 
 class App extends React.Component {
-  state = {};
-  _isMounted = false;
+  // state = {
+  //   board: [],
+  //   searchword: "",
+  //   boardchars: "",
+  //   message: "",
+  //   wordlist: [],
+  //   validwords: [],
+  //   showMatrix: false,
+  //   minutes: 1,
+  //   seconds: 0,
+  //   dontshowResult: true,
+  // };
 
   constructor() {
     super();
-    this.state = {
+    this.state = this.InitialState;
+    this.getvalidwords = this.getvalidwords.bind(this);
+  }
+
+  componentDidMount() {
+    this.setchar();
+    passCsrfToken(document, axios);
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+    clearInterval(this.myTimer);
+  }
+
+  get InitialState() {
+    return {
       board: [],
       searchword: "",
       boardchars: "",
@@ -26,37 +51,30 @@ class App extends React.Component {
       seconds: 0,
       dontshowResult: true,
     };
-    this.getvalidwords = this.getvalidwords.bind(this);
-  }
-
-  componentDidMount() {
-    this.setchar();
-    passCsrfToken(document, axios);
   }
 
   myTimer() {
-    this.myInterval;
-  }
-  myInterval = setInterval(() => {
-    const { seconds, minutes } = this.state;
-    if (seconds > 0) {
-      this.setState(({ seconds }) => ({
-        seconds: seconds - 1,
-      }));
-    }
-    if (seconds === 0) {
-      if (minutes === 0) {
-        clearInterval(this.myInterval);
-        this.setState({ dontshowResult: false });
-        console.log(this.state.dontshowResult);
-      } else {
-        this.setState(({ minutes }) => ({
-          minutes: minutes - 1,
-          seconds: 59,
+    setInterval(() => {
+      const { seconds, minutes } = this.state;
+      if (seconds > 0) {
+        console.log("timer running");
+        this.setState(({ seconds }) => ({
+          seconds: seconds - 1,
         }));
       }
-    }
-  }, 1000);
+      if (seconds === 0) {
+        if (minutes === 0) {
+          clearInterval(this.myTimer);
+          this.setState({ dontshowResult: false });
+        } else {
+          this.setState(({ minutes }) => ({
+            minutes: minutes - 1,
+            seconds: 59,
+          }));
+        }
+      }
+    }, 1000);
+  }
 
   setboardchars() {
     let boardchars = "";
@@ -67,9 +85,11 @@ class App extends React.Component {
         });
       }
     });
-    this.setState({ boardchars }, async () => {
-      await this.setworddictionary();
-    });
+    if (this._isMounted) {
+      this.setState({ boardchars }, async () => {
+        await this.setworddictionary();
+      });
+    }
   }
 
   setworddictionary() {
@@ -78,30 +98,21 @@ class App extends React.Component {
     };
     axios.post("/api/word", post).then((response) => {
       var result = response.data.value.raw_body;
-      this.setState(
-        { wordlist: result }
-        // ,
-        // this.setState({
-        //   wordlist: this.state.wordlist.filter((item) => {
-        //     if (
-        //       this.state.boardchars.includes("Q") &&
-        //       !this.state.boardchars.includes("U")
-        //     ) {
-        //       item.substring(1, 1) != "Q";
-        //     } else {
-        //       item;
-        //     }
-        //   }),
-        // })
-      );
+      if (this._isMounted) {
+        this.setState({ wordlist: result });
+      }
     });
   }
 
   setchar = () => {
+    this._isMounted = true;
+    console.log("here");
     axios.get(`http://127.0.0.1:3000/api/board`).then((res) => {
       const board = res.data.value;
-      this.setState({ board });
-      this.setboardchars();
+      if (this._isMounted) {
+        this.setState({ board });
+        this.setboardchars();
+      }
     });
   };
 
@@ -116,9 +127,6 @@ class App extends React.Component {
   };
 
   searchword = (word) => {
-    console.log("boardchars", this.state.boardchars);
-    console.log(this.state.wordlist);
-    debugger;
     if (word.length <= 2) {
       this.setState({ message: "Word too short" });
     } else {
@@ -160,9 +168,16 @@ class App extends React.Component {
   };
 
   getvalidwords = () => {
-    console.log("validwords", this.state.validwords);
-    this.setState({ showMatrix: true });
-    this.myTimer();
+    console.log("hey");
+    this.setState({ showMatrix: true }, this.myTimer());
+  };
+
+  resetGame = () => {
+    var nstate = this.InitialState;
+    console.log("state", nstate);
+    this.setState(nstate);
+    this.setchar();
+    this.setState({ showMatrix: true, minutes: 1 });
   };
 
   render() {
@@ -171,12 +186,17 @@ class App extends React.Component {
       padding: "20px",
     };
     return (
-      <React.Fragment>
+      <div
+        className="Container"
+        style={{ marginTop: "50px", marginLeft: "50px" }}
+      >
         <h1>Boggle Game</h1>
         {this.state.showMatrix == false ? (
           <button onClick={this.getvalidwords}>Start</button>
         ) : (
           <React.Fragment>
+            <button onClick={this.resetGame}>New Board</button>
+            <br />
             {this.state.dontshowResult == true ? (
               <div style={{ width: "100%", overflow: "hidden" }}>
                 <Timer
@@ -193,9 +213,9 @@ class App extends React.Component {
                 </div>
                 <div
                   style={{
-                    marginLeft: "620px",
-                    maxHeight: "200px",
-                    overflowY: "scroll",
+                    maxHeight: "1000px",
+                    overflowY: "hidden",
+                    float: "left",
                   }}
                 >
                   <Validwords wordslist={this.state.validwords} />
@@ -209,7 +229,7 @@ class App extends React.Component {
             )}
           </React.Fragment>
         )}
-      </React.Fragment>
+      </div>
     );
   }
 }

@@ -3,12 +3,7 @@ import PropTypes from "prop-types";
 class Validwords extends React.Component {
   constructor(props) {
     super(props);
-    console.log("props", this.props.wordslist);
   }
-  // getwordlist(){
-  //   wordlist=this.props.wordslist;
-  //   return
-  // }
 
   render() {
     const listItems = Object.keys(this.props.wordslist).map((key) => {
@@ -18,7 +13,7 @@ class Validwords extends React.Component {
     return (
       <React.Fragment>
         <h2>Words:</h2>
-        <ul>{listItems}</ul>
+        <ul style={{ MarginTop: "30px" }}>{listItems}</ul>
       </React.Fragment>
     );
   }

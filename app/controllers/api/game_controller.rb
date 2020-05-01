@@ -36,11 +36,12 @@ class Api::GameController < ApplicationController
 
     def createBoard
         matrix = Array.new(4) { Array.new(4) { Array('A'..'Z').sample } }
+        boardchars=""
         tvd=[]
         for i in 0..3
             for j in 0..3       
                 # no adjacent cells should have same value    
-                cellval=matrix[i][j]
+                cellval=matrix[i][j]               
                 rs=adjacentlist(i,j,matrix,tvd)
                 # make value of adjacent cells unique                
                 rs=adjacentlist(i,j,matrix,tvd)
@@ -54,6 +55,16 @@ class Api::GameController < ApplicationController
                 end
                 
             end
+        end
+
+        matrix.each do |value|
+            result=value.join(" ")
+         boardchars+=result
+        end
+        vowelscount=boardchars.chars.count {|c| c =~ /[aeiou]/i }
+        if vowelscount==0
+            p "no vowels"
+            createBoard()
         end
         render json: { 
             :value => matrix

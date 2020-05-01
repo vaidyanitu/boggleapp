@@ -4,7 +4,7 @@ class Board extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <table>
+        <table style={{ MarginTop: "30px" }}>
           <tbody>
             {this.props.board.map((row, i) => (
               <tr key={i} id={i}>

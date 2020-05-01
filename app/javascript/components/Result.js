@@ -13,7 +13,7 @@ class Result extends React.Component {
       <React.Fragment>
         <div style={{ width: "100%" }}>
           <div style={{ width: "600px", float: "left" }}>
-            <table>
+            <table style={{ marginTop: "50px" }}>
               <tbody>
                 <tr>
                   <th>Word</th>
@@ -22,7 +22,7 @@ class Result extends React.Component {
                 {this.props.validwords.map((word, index) => (
                   <tr
                     key={index}
-                    style={{ maxHeight: "300px", overflowY: "scroll" }}
+                    style={{ maxHeight: "1000px", overflowY: "scroll" }}
                   >
                     <td key={"a" + index}>{word}</td>
                     <td key={"b" + index}>{word.length}</td>
@@ -35,7 +35,14 @@ class Result extends React.Component {
               </tbody>
             </table>
           </div>
-          <div>
+          <div
+            style={{
+              width: "400px",
+              float: "left",
+              maxHeight: "1800px",
+            }}
+          >
+            <div style={{ float: "left" }}></div>
             <h3>Your Total Score:{this.totalscore()}</h3>
             <h2>Possible list of words:</h2>
             <p>{this.props.dictionary}</p>

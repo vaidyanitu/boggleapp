@@ -6,7 +6,6 @@ class Result extends React.Component {
     for (let num of this.props.validwords) {
       sum = sum + num.length;
     }
-    console.log("sum", sum);
     return sum;
   };
   render() {

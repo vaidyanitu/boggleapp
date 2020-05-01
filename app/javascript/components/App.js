@@ -34,28 +34,29 @@ class App extends React.Component {
     passCsrfToken(document, axios);
   }
 
-  myInterval() {
-    setInterval(() => {
-      const { seconds, minutes } = this.state;
-      if (seconds > 0) {
-        this.setState(({ seconds }) => ({
-          seconds: seconds - 1,
+  myTimer() {
+    this.myInterval;
+  }
+  myInterval = setInterval(() => {
+    const { seconds, minutes } = this.state;
+    if (seconds > 0) {
+      this.setState(({ seconds }) => ({
+        seconds: seconds - 1,
+      }));
+    }
+    if (seconds === 0) {
+      if (minutes === 0) {
+        clearInterval(this.myInterval);
+        this.setState({ dontshowResult: false });
+        console.log(this.state.dontshowResult);
+      } else {
+        this.setState(({ minutes }) => ({
+          minutes: minutes - 1,
+          seconds: 59,
         }));
       }
-      if (seconds === 0) {
-        if (minutes === 0) {
-          clearInterval(this.myInterval);
-          this.setState({ dontshowResult: false });
-          console.log(this.state.dontshowResult);
-        } else {
-          this.setState(({ minutes }) => ({
-            minutes: minutes - 1,
-            seconds: 59,
-          }));
-        }
-      }
-    }, 1000);
-  }
+    }
+  }, 1000);
 
   setboardchars() {
     let boardchars = "";
@@ -161,7 +162,7 @@ class App extends React.Component {
   getvalidwords = () => {
     console.log("validwords", this.state.validwords);
     this.setState({ showMatrix: true });
-    this.myInterval();
+    this.myTimer();
   };
 
   render() {

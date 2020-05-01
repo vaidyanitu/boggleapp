@@ -57,7 +57,6 @@ class App extends React.Component {
     setInterval(() => {
       const { seconds, minutes } = this.state;
       if (seconds > 0) {
-        console.log("timer running");
         this.setState(({ seconds }) => ({
           seconds: seconds - 1,
         }));
@@ -106,7 +105,6 @@ class App extends React.Component {
 
   setchar = () => {
     this._isMounted = true;
-    console.log("here");
     axios.get(`http://127.0.0.1:3000/api/board`).then((res) => {
       const board = res.data.value;
       if (this._isMounted) {
@@ -168,13 +166,11 @@ class App extends React.Component {
   };
 
   getvalidwords = () => {
-    console.log("hey");
     this.setState({ showMatrix: true }, this.myTimer());
   };
 
   resetGame = () => {
     var nstate = this.InitialState;
-    console.log("state", nstate);
     this.setState(nstate);
     this.setchar();
     this.setState({ showMatrix: true, minutes: 1 });
